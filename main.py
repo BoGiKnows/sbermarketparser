@@ -47,6 +47,8 @@ class SeleniumClass:
     def parse_page(self, page):
         soup = BeautifulSoup(page, 'html.parser')
         goods = soup.find('div', class_='catalog-listing__items catalog-listing__items_divider-wide')
+        if not goods:
+            return
         list_of_goods = goods.find_all('div', attrs={"data-list-id": "main"}, recursive=False)
         category = soup.find('h1', attrs={'itemprop': 'name'}).text
         results = []
@@ -87,14 +89,18 @@ class SeleniumClass:
         else:
             result = []
             print('начинаю парсинг')
-            for page_number in range(1, 20):
+            for page_number in range(1, 100):
                 self.driver.get(url + str(page_number))
                 page = self.driver.page_source
-                with open('page.html', 'w', encoding='utf-8') as file:
-                    file.write(page)
                 parsed_page = self.parse_page(page)
+
+                if not parsed_page:
+                    print(f'закончен парсинг {page_number} страницы')
+                    break
+
                 result.extend(parsed_page)
                 print(f'закончен парсинг {page_number} страницы')
+
             print('парсинг завершен')
             self.write_csv(result)
 
