@@ -89,10 +89,13 @@ class SeleniumClass:
         else:
             result = []
             print('начинаю парсинг')
-            for page_number in range(1, 100):
+            for page_number in range(1, 999999):
                 self.driver.get(url + str(page_number))
                 page = self.driver.page_source
-                parsed_page = self.parse_page(page)
+                try:
+                    parsed_page = self.parse_page(page)
+                except Exception as ex:
+                    continue
 
                 if not parsed_page:
                     print(f'закончен парсинг {page_number} страницы')
